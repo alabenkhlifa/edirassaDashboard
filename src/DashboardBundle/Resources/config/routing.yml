@@ -1,3 +1,21 @@
 dashboard_homepage:
     path:     /
     defaults: { _controller: DashboardBundle:Default:index }
+dashboard_remote:
+    path:     /remote
+    defaults: { _controller: DashboardBundle:Default:remote }
+dashboard_monitoring:
+    path:     /monitoring
+    defaults: { _controller: DashboardBundle:Default:monitoring }
+dashboard_ajax:
+    path:     /ajax
+    defaults: { _controller: DashboardBundle:Default:ajax }
+dashboard_serverAdd:
+    path:     /server/add
+    defaults: { _controller: DashboardBundle:Default:serverAdd }
+dashboard_serverList:
+    path:     /server/list
+    defaults: { _controller: DashboardBundle:Default:serverList }
+dashboard_serverDelete:
+    path:     /server/delete/{id}
+    defaults: { _controller: DashboardBundle:Default:serverDelete }
