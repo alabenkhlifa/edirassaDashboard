@@ -13,7 +13,7 @@
                             <th><i class="fa fa-bullhorn"></i> Server Name</th>
                             <th class="hidden-phone"><i class="fa fa-question-circle"></i> IP Address</th>
                             <th><i class="fa fa-bookmark"></i> credentials</th>
-                            <th><i class=" fa fa-tag"></i> </th>
+                            <th> </th>
                             <th></th>
                         </tr>
                         </thead>
@@ -24,7 +24,10 @@
                             <td><span class="label label-info label-mini">{{ server.ip }}</span></td>
                             <td class="hidden-phone">{{ server.username }}/{{ server.password }}</td>
                             <td>
-                                <a class="btn btn-success btn-xs" href="http://{{ server.ip }}:6175">Connect</a>
+                                <center>
+                                    <a class="btn btn-success btn-xs" href="http://{{ server.ip }}:6175">Connect (Shell In A Box)</a>
+                                    <a class="btn btn-primary btn-xs" href="http://localhost/dashboard/edirassaDashboard/files_to_upload/index.php">Connect (Net2FTP)</a>
+                                </center>
                             </td>
                         </tr>
                             {% endfor %}
