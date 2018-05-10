@@ -9,6 +9,7 @@
 
 namespace DashboardBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="DashboardBundle\Repository\ServerRepository")
@@ -43,6 +44,11 @@ class Server
      * @ORM\Column(type="string", length=50 ,nullable=false, unique=false)
      */
     private $password;
+
+    /**
+     * @ORM\OneToMany(targetEntity="DashboardBundle\Entity\Service", mappedBy="server")
+     */
+    private $services;
 
     /**
      * @return mixed
@@ -122,6 +128,27 @@ class Server
     public function setPassword($password)
     {
         $this->password = $password;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getservices()
+    {
+        return $this->services;
+    }
+
+    /**
+     * @param ArrayCollection $services
+     */
+    public function setservices($services)
+    {
+        $this->services = $services;
+    }
+
+    public function __construct()
+    {
+        $this->services = new ArrayCollection();
     }
 
 

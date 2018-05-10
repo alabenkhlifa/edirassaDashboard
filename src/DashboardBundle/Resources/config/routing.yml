@@ -19,3 +19,6 @@ dashboard_serverList:
 dashboard_serverDelete:
     path:     /server/delete/{id}
     defaults: { _controller: DashboardBundle:Default:serverDelete }
+dashboard_sericeAssign:
+    path:     /service/assign/{id}
+    defaults: { _controller: DashboardBundle:Default:serviceAssign }

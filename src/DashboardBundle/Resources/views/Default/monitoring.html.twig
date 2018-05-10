@@ -12,28 +12,24 @@
                         <tr>
                             <th><i class="fa fa-bullhorn"></i> Server Name</th>
                             <th class="hidden-phone"><i class="fa fa-question-circle"></i> IP Address</th>
-                            <th><i class="fa fa-bookmark"></i> Credentials</th>
+                            <th><i class="fa fa-bookmark"></i> Services</th>
                             <th><i class=" fa fa-archive"></i> </th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>Ala-PC</td>
-                            <td><span class="label label-info label-mini">192.168.3.36</span></td>
-                            <td class="hidden-phone">root/ala</td>
-                            <td>
-                                <button class="btn btn-success btn-xs">Connect</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Ala-PC-2</td>
-                            <td><span class="label label-info label-mini">192.168.3.37</span></td>
-                            <td class="hidden-phone">root/ala</td>
-                            <td>
-                                <button class="btn btn-success btn-xs">Connect</button>
-                            </td>
-                        </tr>
+                        {% for server in servers %}
+                            <tr>
+                                <td>{{ server.name }}</td>
+                                <td><span class="label label-info label-mini">{{ server.ip }}</span></td>
+                                <td class="hidden-phone"><span class="label label-danger label-mini">FTP</span> </td>
+                                <td>
+                                    <center>
+                                        <a class="btn btn-success btn-xs" href="http://{{ server.ip }}:6175">Control</a>
+                                    </center>
+                                </td>
+                            </tr>
+                        {% endfor %}
                         </tbody>
                     </table>
                 </div><!-- /content-panel -->
