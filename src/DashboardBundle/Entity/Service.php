@@ -29,11 +29,36 @@ class Service
     private $name;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="daemon", type="string", length=255)
+     */
+    private $daemon;
+
+    /**
      * @ORM\ManyToOne(targetEntity="DashboardBundle\Entity\Server", inversedBy="services")
      * @ORM\JoinColumn(name="server_id", referencedColumnName="id")
      */
 
     private $server;
+
+    /**
+     * @return string
+     */
+    public function getDaemon()
+    {
+        return $this->daemon;
+    }
+
+    /**
+     * @param string $daemon
+     */
+    public function setDaemon($daemon)
+    {
+        $this->daemon = $daemon;
+    }
+
+
 
 
     /**
@@ -73,7 +98,7 @@ class Service
     /**
      * Set serverId
      *
-     * @param integer $server
+     * @param Server $server
      *
      * @return Service
      */
@@ -87,7 +112,7 @@ class Service
     /**
      * Get server
      *
-     * @return int
+     * @return Server
      */
     public function getServer()
     {

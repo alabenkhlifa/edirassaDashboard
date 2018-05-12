@@ -22,3 +22,12 @@ dashboard_serverDelete:
 dashboard_sericeAssign:
     path:     /service/assign/{id}
     defaults: { _controller: DashboardBundle:Default:serviceAssign }
+dashboard_serivceStatus:
+    path:     /service/status
+    defaults: { _controller: DashboardBundle:Default:serviceStatus }
+dashboard_serivceStart:
+    path:     /service/start/{id}
+    defaults: { _controller: DashboardBundle:Default:serviceStart }
+dashboard_serivceStop:
+    path:     /service/stop/{id}
+    defaults: { _controller: DashboardBundle:Default:serviceStop }

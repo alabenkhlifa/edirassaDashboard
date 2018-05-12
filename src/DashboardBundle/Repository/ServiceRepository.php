@@ -10,4 +10,11 @@ namespace DashboardBundle\Repository;
  */
 class ServiceRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findAssigned(){
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT s FROM DashboardBundle:Service s WHERE s.server IS NOT NULL'
+            )
+            ->getResult();
+    }
 }

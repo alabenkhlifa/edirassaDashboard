@@ -69,6 +69,7 @@
                     <ul class="sub">
                         <li><a  href="http://localhost/dashboard/edirassaDashboard/files_to_upload/index.php">File Transfert</a></li>
                         <li><a  href="{{ path('dashboard_remote') }}">Remote Control</a></li>
+                        <li><a  href="{{ path('dashboard_serivceStatus') }}">Service Status</a></li>
                     </ul>
                 </li>
                 <li class="sub-menu">
@@ -141,9 +142,9 @@
                         <div class="col-md-2 col-sm-2 box0">
                             <div class="box1">
                                 <span class="li_news"></span>
-                                <h3>+10</h3>
+                                <h3>{{ ftpSize }}</h3>
                             </div>
-                            <p>More than 10 news were added in your reader.</p>
+                            <p>FTP Folder Size is {{ ftpSize }}.</p>
                         </div>
                         <div class="col-md-2 col-sm-2 box0">
                             <div class="box1">
