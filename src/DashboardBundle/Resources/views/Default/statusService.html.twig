@@ -19,7 +19,7 @@
                         <tbody>
                         {% for server in servers %}
                         <tr>
-                            <td>{{ server.name }}</td>
+                            <td><p {% if server in offlineServers %} style="color: red" {% endif %}>{{ server.name }}</p></td>
                             <td>{{ server.ip }}</td>
                             <td>
                                 {% if server.services is not null %}
@@ -29,7 +29,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if server.services is not null %}
+                                {% if server.services is not null and server not in offlineServers %}
                                     {% for service in server.services %}
                                         <!-- Single button -->
                                         <div class="btn-group">

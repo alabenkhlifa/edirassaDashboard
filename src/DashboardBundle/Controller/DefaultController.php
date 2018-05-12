@@ -4,6 +4,7 @@ namespace DashboardBundle\Controller;
 
 use DashboardBundle\Entity\Notification;
 use DashboardBundle\Entity\Server;
+use DashboardBundle\Entity\Service;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ class DefaultController extends Controller
     public function indexAction()
     {
         $sizeFTPFolder = "0 Mo";
+        $em=$this->getDoctrine()->getManager();
+        $notfications = $em->getRepository('DashboardBundle:Notification')->getLast(3);
+        $servers = $em->getRepository('DashboardBundle:Server')->findAll();
+        $servercount = $em->getRepository('DashboardBundle:Server')->findCount();
+        $serverOnline = $servercount;
         try{
             $ssh = new ssh2('192.168.3.36','22');
             if (!$ssh->login('root', 'ala')) {
@@ -23,15 +29,19 @@ class DefaultController extends Controller
             $sizeFTPFolder = $ssh->exec('du -h /var/ftp/virtual_users/vsftpd | cut -f1 | tail -1');
         }
         catch (\Exception $e){
-            var_dump($e);
-            die();
         }
         finally{
-            $em=$this->getDoctrine()->getManager();
-            $notfications = $em->getRepository('DashboardBundle:Notification')->getLast(3);
-            $servercount = $em->getRepository('DashboardBundle:Server')->findCount();
-
-            return $this->render('@Dashboard/Default/layout.html.twig',array('servercount'=>$servercount,'notifications'=>$notfications,"ftpSize"=>$sizeFTPFolder));
+            foreach ($servers as $server) {
+                try {
+                    $ssh = new ssh2($server->getIp(),'22');
+                    $ssh->login($server->getUsername(), $server->getPassword());
+                }
+                catch (\Exception $e){
+                    $serverOnline = $serverOnline - 1;
+                }
+            }
+            return $this->render('@Dashboard/Default/layout.html.twig',array('servercount'=>$servercount,'notifications'=>$notfications
+                ,"ftpSize"=>$sizeFTPFolder,'serverOnline'=>$serverOnline));
         }
     }
 
@@ -41,9 +51,11 @@ class DefaultController extends Controller
         $services = $em->getRepository('DashboardBundle:Service')->findAssigned();
         $runningServices = array();
         $stoppedServices = array();
+        $offlineServers = array();
         foreach ($services as $service){
             $server = $em->getRepository('DashboardBundle:Server')->findOneById($service->getServer());
             $ssh = new ssh2($server->getIp(),'22');
+            try{
             if (!$ssh->login($server->getUsername(), $server->getPassword())) {
                 echo "Server".$server->getIp()." is Down";
                 die();
@@ -55,8 +67,13 @@ class DefaultController extends Controller
             else{
                 array_push($runningServices,$service);
             }
+            }
+            catch (\Exception $e){
+                if(!in_array($server,$offlineServers))
+                    array_push($offlineServers,$server);
+            }
         }
-        return $this->render('@Dashboard/Default/statusService.html.twig',array('servers'=>$servers,'runningservices'=>$runningServices));
+        return $this->render('@Dashboard/Default/statusService.html.twig',array('servers'=>$servers,'runningservices'=>$runningServices,'offlineServers'=>$offlineServers));
     }
 
     public function remoteAction()
@@ -128,14 +145,19 @@ class DefaultController extends Controller
         $service = $em->getRepository('DashboardBundle:Service')->findOneBy(array('id'=>$id));
         $server = $em->getRepository('DashboardBundle:Server')->findOneBy(array('id'=>$service->getServer()));
         $ssh = new ssh2($server->getip(),'22');
-        if (!$ssh->login($server->getUsername(), $server->getPassword())) {
-            echo "Server ".$server->getIp()." is Down";
+        try {
+            if (!$ssh->login($server->getUsername(), $server->getPassword())) {
+                echo "Server " . $server->getIp() . " is Down";
+            }
+            $ssh->exec('service ' . $service->getDaemon() . ' start');
+            $notification = new Notification();
+            $notification->setContent('Service ' . $service->getName() . ' Started On ' . $server->getName() . '.');
+            $em->persist($notification);
+            $em->flush();
         }
-        $ssh->exec('service '.$service->getDaemon().' start');
-        $notification = new Notification();
-        $notification->setContent('Service '.$service->getName().' Started On '.$server->getName().'.');
-        $em->persist($notification);
-        $em->flush();
+        catch (\Exception $e){
+            var_dump("Cannot Connect to ".$server->getName().".\nPlease check if the server is up.");
+        }
         return $this->redirectToRoute('dashboard_serivceStatus');
     }
 
@@ -145,14 +167,19 @@ class DefaultController extends Controller
         $service = $em->getRepository('DashboardBundle:Service')->findOneBy(array('id'=>$id));
         $server = $em->getRepository('DashboardBundle:Server')->findOneBy(array('id'=>$service->getServer()));
         $ssh = new ssh2($server->getip(),'22');
-        if (!$ssh->login($server->getUsername(), $server->getPassword())) {
-            echo "Server ".$server->getIp()." is Down";
+        try {
+            if (!$ssh->login($server->getUsername(), $server->getPassword())) {
+                echo "Server " . $server->getIp() . " is Down";
+            }
+            $ssh->exec('service ' . $service->getDaemon() . ' stop');
+            $notification = new Notification();
+            $notification->setContent('Service ' . $service->getName() . ' Stopped On ' . $server->getName() . '.');
+            $em->persist($notification);
+            $em->flush();
         }
-        $ssh->exec('service '.$service->getDaemon().' stop');
-        $notification = new Notification();
-        $notification->setContent('Service '.$service->getName().' Stopped On '.$server->getName().'.');
-        $em->persist($notification);
-        $em->flush();
+        catch (\Exception $e){
+            var_dump("Cannot Connect to ".$server->getName().".\nPlease check if the server is up.");
+        }
         return $this->redirectToRoute('dashboard_serivceStatus');
     }
 
@@ -189,5 +216,18 @@ class DefaultController extends Controller
         }
         return $this->render('@Dashboard/Default/ajax.html.twig');
 
+    }
+
+    public function serviceAddAction(Request $request){
+        if($request->isMethod('POST')) {
+            $em = $this->getDoctrine()->getManager();
+            $service = new Service();
+            $service->setName($request->get('servicename'));
+            $service->setDaemon($request->get('daemonname'));
+            $em->persist($service);
+            $em->flush();
+            return $this->redirectToRoute('dashboard_serivceAdd');
+        }
+        return $this->render('@Dashboard/Default/addService.html.twig');
     }
 }

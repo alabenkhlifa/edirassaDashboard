@@ -31,3 +31,6 @@ dashboard_serivceStart:
 dashboard_serivceStop:
     path:     /service/stop/{id}
     defaults: { _controller: DashboardBundle:Default:serviceStop }
+dashboard_serivceAdd:
+    path:     /service/add
+    defaults: { _controller: DashboardBundle:Default:serviceAdd }
