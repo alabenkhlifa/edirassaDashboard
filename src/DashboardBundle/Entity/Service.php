@@ -37,7 +37,7 @@ class Service
 
     /**
      * @ORM\ManyToOne(targetEntity="DashboardBundle\Entity\Server", inversedBy="services")
-     * @ORM\JoinColumn(name="server_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="server_id", referencedColumnName="id",onDelete="SET NULL")
      */
 
     private $server;

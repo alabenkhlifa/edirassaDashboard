@@ -57,8 +57,8 @@ class DefaultController extends Controller
             $ssh = new ssh2($server->getIp(),'22');
             try{
             if (!$ssh->login($server->getUsername(), $server->getPassword())) {
-                echo "Server".$server->getIp()." is Down";
-                die();
+                /*echo "Server".$server->getIp()." is Down";
+                die();*/
             }
             $result = $ssh->exec('service '.$service->getDaemon().' status');
             if(strpos($result,"stopped")!=false){
